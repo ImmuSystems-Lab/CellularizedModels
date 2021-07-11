@@ -1,5 +1,0 @@
-<Simulation version="4.1.0">
-   <XMLScript Type="XMLScript">Simulation/CoinfectionModel.xml</XMLScript>
-   <PythonScript Type="PythonScript">Simulation/CoinfectionModel.py</PythonScript>
-   <Resource Type="Python">Simulation/CoinfectionModelSteppables.py</Resource>
-</Simulation>

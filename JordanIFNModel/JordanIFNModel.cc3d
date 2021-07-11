@@ -1,5 +1,0 @@
-<Simulation version="4.1.0">
-   <XMLScript Type="XMLScript">Simulation/JordanIFNModel.xml</XMLScript>
-   <PythonScript Type="PythonScript">Simulation/JordanIFNModel.py</PythonScript>
-   <Resource Type="Python">Simulation/JordanIFNModelSteppables.py</Resource>
-</Simulation>

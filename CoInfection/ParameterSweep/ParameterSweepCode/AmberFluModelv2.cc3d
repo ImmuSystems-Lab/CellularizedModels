@@ -1,5 +1,0 @@
-<Simulation version="4.1.0">
-   <XMLScript Type="XMLScript">Simulation/AmberFluModel.xml</XMLScript>
-   <PythonScript Type="PythonScript">Simulation/AmberFluModel.py</PythonScript>
-   <Resource Type="Python">Simulation/AmberFluModelSteppables.py</Resource>
-</Simulation>
