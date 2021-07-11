@@ -1,5 +1,0 @@
-<Simulation version="4.1.0">
-   <XMLScript Type="XMLScript">Simulation/JordanAmberModel.xml</XMLScript>
-   <PythonScript Type="PythonScript">Simulation/JordanAmberModel.py</PythonScript>
-   <Resource Type="Python">Simulation/JordanAmberModelSteppables.py</Resource>
-</Simulation>
