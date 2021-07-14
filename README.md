@@ -10,7 +10,7 @@ version of CC3D to execute the code and clone this repository to their local mac
 Inside the directory, users can find the main simulation file: **IFNModel.cc3d**. 
 To execute the base simulation lunch CompuCell3D and load the simulation file: File > Open Simulation File (.cc3d).
 
-<img src="./Readme_Images/1.png" width="300" height="300" alt="1"/>
+<img src="./Readme_Images/1.png" width="400" height="150" alt="1"/>
 
 Locate the main simulation file **IFNModel.cc3d** and execute the simulation by hitting the **Run** button.
 
