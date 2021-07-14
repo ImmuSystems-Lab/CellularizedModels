@@ -10,17 +10,17 @@ version of CC3D to execute the code and clone this repository to their local mac
 Inside the directory, users can find the main simulation file: **IFNModel.cc3d**. 
 To execute the base simulation lunch CompuCell3D and load the simulation file: File > Open Simulation File (.cc3d).
 
-![1](./Readme_Images/1.png)
+<img src="./Readme_Images/1.png" width="300" height="300" alt="1"/>
 
 Locate the main simulation file **IFNModel.cc3d** and execute the simulation by hitting the **Run** button.
 
-![2](./Readme_Images/2.png)
+<img src="./Readme_Images/2.png" width="300" height="300" alt="2"/>
 
 Since configuration files are not shared in this repository, display configurations might be slightly different for each user. 
 By default, CC3D displays a single graphic window showing the *Cell_Field*, which corresponds to the cell lattice colored 
 by their different types. To display the extracellular species (Virus and IFN), click on the **New Graphics Window** button.
 
-![3](./Readme_Images/3.png)
+<img src="./Readme_Images/3.png" width="300" height="300" alt="3"/>
 
 In the new graphics window, choose the specific extracellular species of interest from the pulldown menu.
 
