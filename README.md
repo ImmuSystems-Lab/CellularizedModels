@@ -24,4 +24,4 @@ by their different types. To display the extracellular species (Virus and IFN), 
 
 In the new graphics window, choose the specific extracellular species of interest from the pulldown menu.
 
-![4](./Readme_Images/4.png)
+<img src="./Readme_Images/4.png" width="300" height="300" alt="4"/>
