@@ -1,0 +1,5 @@
+<Simulation version="4.1.0">
+   <XMLScript Type="XMLScript">Simulation/IFNModel.xml</XMLScript>
+   <PythonScript Type="PythonScript">Simulation/IFNModel.py</PythonScript>
+   <Resource Type="Python">Simulation/IFNModelSteppables.py</Resource>
+</Simulation>
