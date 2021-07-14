@@ -3,15 +3,15 @@ import numpy as np
 import os
 import Parameters
 
-IFNWash = False #Whether the plate is prestimulated with IFNe before infection
+IFNWash = False  # Whether the plate is prestimulated with IFNe before infection
 
 min_to_mcs = 10.0  # min/mcs
-hours_to_mcs = min_to_mcs / 60.0 # hours/mcs
+hours_to_mcs = min_to_mcs / 60.0  # hours/mcs
 days_to_mcs = min_to_mcs / 1440.0  # day/mcs
 hours_to_simulate = 80.0  # 10 in the original model
 
-virus_diffusion_coefficient = 1.0/10.0 #vl^2 / min
-IFNe_diffusion_coefficient = 1.0/10.0 #vl^2 / min
+virus_diffusion_coefficient = 1.0 / 10.0  # vl^2 / min
+IFNe_diffusion_coefficient = 1.0 / 10.0  # vl^2 / min
 
 Replicate = Parameters.R
 
@@ -19,7 +19,7 @@ folder_path = '/Users/joaponte/Desktop/IFNModel/'
 if not os.path.exists(folder_path):
     os.makedirs(folder_path)
 
-#Cell Transition Model
+# Cell Transition Model
 FluModel_string = '''        
         model FluModel()
 
@@ -59,7 +59,7 @@ viral_model_string = '''
     //Initial Conditions
     V =  0.0      ; 
     H = 1.0          ;
-    
+
     //Inputs
     IFNe  =  0.0     ;
 '''
@@ -76,7 +76,7 @@ IFN_model_string = '''
     E6b: IRF7P ->       ; t5*IRF7P                                          ;
 
     //Parameters
-    //k11 = 10.0^(5)  ; 
+    // k11 = 10.0^(5)  ; 
     k11 = 0.0       ; 
     k12 = 9.746     ; 
     k13 = 12.511    ; 
@@ -93,7 +93,7 @@ IFN_model_string = '''
     t5  = 0.3       ;
     n   = 3.0       ;
     RIGI = 1.0      ;
-    
+
     // Inputs
     H    = 0.0      ;
     IFNe = 0.0      ;
@@ -127,26 +127,21 @@ class ODEModelSteppable(SteppableBasePy):
         self.add_antimony_to_cell_types(model_string=IFN_model_string, model_name='IModel',
                                         cell_types=[self.U], step_size=hours_to_mcs)
 
-        # Parameter Scan
-        # self.sbml.FluModel['beta'] *= Multiplier
-        # for cell in self.cell_list:
-            # cell.sbml.IModel['k11'] *= Multiplier
-            # cell.sbml.VModel['k73'] *= Multiplier
-
         # Initial conditions: infected cell in the center
         cell = self.cell_field[self.dim.x // 2, self.dim.y // 2, 0]
         cell.type = self.I1
         cell.sbml.VModel['V'] = 6.9e-8
         self.sbml.FluModel['I1'] = 1.0 / self.shared_steppable_vars['InitialNumberCells']
         self.sbml.FluModel['V'] = 0.0
-        
-        #Set prestimulated internal protein values
+
+        # Set prestimulated internal protein values
         if IFNWash:
-            for cell in self.cell_list_by_type(self.U,self.I1):
+            for cell in self.cell_list_by_type(self.U, self.I1):
                 cell.sbml.IModel['IFN'] = 0.035
                 cell.sbml.IModel['IRF7'] = 0.097
                 cell.sbml.IModel['IRF7P'] = 0.028
-                cell.sbml.IModel['STATP'] = 0.714   
+                cell.sbml.IModel['STATP'] = 0.714
+
 
 class CellularModelSteppable(SteppableBasePy):
     def __init__(self, frequency=1):
@@ -168,12 +163,12 @@ class CellularModelSteppable(SteppableBasePy):
     def step(self, mcs):
         ## Measure amount of IFNe in the Field
         self.shared_steppable_vars['ExtracellularIFN_Field'] = 0
-        for cell in self.cell_list_by_type(self.U,self.I1,self.I2):
+        for cell in self.cell_list_by_type(self.U, self.I1, self.I2):
             self.shared_steppable_vars['ExtracellularIFN_Field'] += self.secretorIFN.amountSeenByCell(cell)
 
         ## Production of IFNe
         # E2b: IFN -> IFNe; k21 * IFN ;
-        for cell in self.cell_list_by_type(self.U,self.I1,self.I2):
+        for cell in self.cell_list_by_type(self.U, self.I1, self.I2):
             intracellularIFN = cell.sbml.IModel['IFN']
             k21 = cell.sbml.IModel['k21'] * hours_to_mcs
             p = k21 * intracellularIFN
@@ -199,7 +194,7 @@ class CellularModelSteppable(SteppableBasePy):
             k61 = cell.sbml.VModel['k61'] * hours_to_mcs
             H = cell.sbml.VModel['H']
             V = cell.sbml.VModel['V']
-            r = k61 * V * (1-H)
+            r = k61 * V * (1 - H)
             p_I2toD = 1.0 - np.exp(-r)
             if np.random.random() < p_I2toD:
                 cell.type = self.DEAD
@@ -233,42 +228,43 @@ class CellularModelSteppable(SteppableBasePy):
 
         self.timestep_sbml()
 
+
 class OutputSteppable(SteppableBasePy):
     def __init__(self, frequency=1):
         SteppableBasePy.__init__(self, frequency)
 
     def start(self):
         # Output Cellular Data
-        file_name1 = 'FullModelCellular_%i.txt' % (Replicate)
+        file_name1 = 'FullModelCellular_%i.txt' % Replicate
         self.output1 = open(folder_path + file_name1, 'w')
-        self.output1.write("%s,%s,%s,%s,%s,%s,%s\n" %('Time','U','I1','I2','D','Ve','IFNe'))
+        self.output1.write("%s,%s,%s,%s,%s,%s,%s\n" % ('Time', 'U', 'I1', 'I2', 'D', 'Ve', 'IFNe'))
         self.output1.flush()
 
         # Output Intracellular Data
-        file_name2 = 'FullModelIntracellular_%i.txt' % (Replicate)
+        file_name2 = 'FullModelIntracellular_%i.txt' % Replicate
         self.output2 = open(folder_path + file_name2, 'w')
         self.output2.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %
-                          ('Time','V','H','P','IFNe','STATP','IRF7','IRF7P','IFN'))
+                           ('Time', 'V', 'H', 'P', 'IFNe', 'STATP', 'IRF7', 'IRF7P', 'IFN'))
         self.output2.flush()
 
-        #IFNe secretor
+        # IFNe secretor
         self.secretorIFNe = self.get_field_secretor("IFNe")
-            
+
     def step(self, mcs):
         Time = mcs * hours_to_mcs
         U = len(self.cell_list_by_type(self.U)) / self.shared_steppable_vars['InitialNumberCells']
-        I1 =  len(self.cell_list_by_type(self.I1)) / self.shared_steppable_vars['InitialNumberCells']
+        I1 = len(self.cell_list_by_type(self.I1)) / self.shared_steppable_vars['InitialNumberCells']
         I2 = len(self.cell_list_by_type(self.I2)) / self.shared_steppable_vars['InitialNumberCells']
-        D =  len(self.cell_list_by_type(self.DEAD)) / self.shared_steppable_vars['InitialNumberCells']
+        D = len(self.cell_list_by_type(self.DEAD)) / self.shared_steppable_vars['InitialNumberCells']
         Ve = self.shared_steppable_vars['ExtracellularVirus_Field']
         IFNe = 0.0
         for cell in self.cell_list:
             IFNe += self.secretorIFNe.amountSeenByCell(cell)
 
-        self.output1.write("%e,%e,%e,%e,%e,%e,%e\n" % (Time,U,I1,I2,D,Ve,IFNe))
+        self.output1.write("%e,%e,%e,%e,%e,%e,%e\n" % (Time, U, I1, I2, D, Ve, IFNe))
         self.output1.flush()
 
-        L = len(self.cell_list_by_type(self.U,self.I1,self.I2))
+        L = len(self.cell_list_by_type(self.U, self.I1, self.I2))
         P = L / self.shared_steppable_vars['InitialNumberCells']
         V = 0.0
         H = 0.0
@@ -276,7 +272,7 @@ class OutputSteppable(SteppableBasePy):
         IRF7 = 0.0
         IRF7P = 0.0
         IFN = 0.0
-        for cell in self.cell_list_by_type(self.U,self.I1,self.I2):
+        for cell in self.cell_list_by_type(self.U, self.I1, self.I2):
             V += cell.sbml.VModel['V'] / L
             H += cell.sbml.VModel['H'] / L
             STATP += cell.sbml.IModel['STATP'] / L
@@ -284,17 +280,17 @@ class OutputSteppable(SteppableBasePy):
             IRF7P += cell.sbml.IModel['IRF7P'] / L
             IFN += cell.sbml.IModel['IFN'] / L
         IFNe = self.shared_steppable_vars['ExtracellularIFN_Field'] \
-                          / self.shared_steppable_vars['InitialNumberCells']
+               / self.shared_steppable_vars['InitialNumberCells']
         self.output2.write("%e,%e,%e,%e,%e,%e,%e,%e,%e\n" %
-                           (Time,V,H,P,IFNe,STATP,IRF7,IRF7P,IFN))
+                           (Time, V, H, P, IFNe, STATP, IRF7, IRF7P, IFN))
         self.output2.flush()
+
 
 class PlaqueAssaySteppable(SteppableBasePy):
     def __init__(self, frequency=1):
         SteppableBasePy.__init__(self, frequency)
 
-    def start(self):
-        file_name3 = 'PlaqueAssay_%i.txt' % (Replicate)
+        file_name3 = 'PlaqueAssay_%i.txt' % Replicate
         self.output3 = open(folder_path + file_name3, 'w')
         self.output3.write("%s,%s,%s,%s\n" % ('Time', 'avgI1rd', 'avgI2rd', 'avgDrd'))
         self.output3.flush()
@@ -304,17 +300,17 @@ class PlaqueAssaySteppable(SteppableBasePy):
         volume_D = 0.0
         for cell in self.cell_list_by_type(self.DEAD):
             volume_D += cell.volume
-        avgDrd = np.sqrt(volume_D/np.pi)
+        avgDrd = np.sqrt(volume_D / np.pi)
 
         volume_I2 = 0.0
         for cell in self.cell_list_by_type(self.I2):
             volume_I2 += cell.volume
-        avgI2rd = np.sqrt((volume_D+volume_I2)/np.pi)
+        avgI2rd = np.sqrt((volume_D + volume_I2) / np.pi)
 
         volume_I1 = 0.0
         for cell in self.cell_list_by_type(self.I1):
             volume_I1 += cell.volume
-        avgI1rd = np.sqrt((volume_D+volume_I2+volume_I1)/np.pi)
+        avgI1rd = np.sqrt((volume_D + volume_I2 + volume_I1) / np.pi)
 
         Time = mcs * hours_to_mcs
         self.output3.write("%e,%e,%e,%e\n" % (Time, avgI1rd, avgI2rd, avgDrd))
