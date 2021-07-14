@@ -14,11 +14,10 @@ virus_diffusion_coefficient = 1.0/10.0 #vl^2 / min
 IFNe_diffusion_coefficient = 1.0/10.0 #vl^2 / min
 
 Replicate = Parameters.R
-#Multiplier = 10**Parameters.M
-Multiplier = Parameters.M 
-Parameter = 'k11'
-# virus_diffusion_coefficient *= Multiplier
-# IFNe_diffusion_coefficient *= Multiplier
+
+folder_path = '/Users/joaponte/Desktop/IFNModel/'
+if not os.path.exists(folder_path):
+    os.makedirs(folder_path)
 
 #Cell Transition Model
 FluModel_string = '''        
@@ -130,12 +129,9 @@ class ODEModelSteppable(SteppableBasePy):
 
         # Parameter Scan
         # self.sbml.FluModel['beta'] *= Multiplier
-        # self.sbml.FluModel['c'] *= Multiplier
-        # self.sbml.FluModel['k'] *= Multiplier
-        for cell in self.cell_list:
-            cell.sbml.IModel['k11'] *= Multiplier
+        # for cell in self.cell_list:
+            # cell.sbml.IModel['k11'] *= Multiplier
             # cell.sbml.VModel['k73'] *= Multiplier
-            # cell.sbml.VModel['t5'] *= Multiplier
 
         # Initial conditions: infected cell in the center
         cell = self.cell_field[self.dim.x // 2, self.dim.y // 2, 0]
@@ -242,19 +238,14 @@ class OutputSteppable(SteppableBasePy):
         SteppableBasePy.__init__(self, frequency)
 
     def start(self):
-        folder_path = '/N/u/joaponte/Carbonate/IFNParameterSweep/Output/'
-        # folder_path = '/Users/joaponte/Desktop/RevisionData/Simulation/'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-
         # Output Cellular Data
-        file_name1 = 'FullModelCellular_%s_%.2f_%i.txt' % (Parameter,Multiplier,Replicate)
+        file_name1 = 'FullModelCellular_%i.txt' % (Replicate)
         self.output1 = open(folder_path + file_name1, 'w')
         self.output1.write("%s,%s,%s,%s,%s,%s,%s\n" %('Time','U','I1','I2','D','Ve','IFNe'))
         self.output1.flush()
 
         # Output Intracellular Data
-        file_name2 = 'FullModelIntracellular_%s_%.2f_%i.txt' % (Parameter,Multiplier,Replicate)
+        file_name2 = 'FullModelIntracellular_%i.txt' % (Replicate)
         self.output2 = open(folder_path + file_name2, 'w')
         self.output2.write("%s,%s,%s,%s,%s,%s,%s,%s,%s\n" %
                           ('Time','V','H','P','IFNe','STATP','IRF7','IRF7P','IFN'))
@@ -303,11 +294,7 @@ class PlaqueAssaySteppable(SteppableBasePy):
         SteppableBasePy.__init__(self, frequency)
 
     def start(self):
-        folder_path = '/N/u/joaponte/Carbonate/IFNParameterSweep/Output/'
-        # folder_path = '/Users/joaponte/Desktop/RevisionData/Simulation/'
-        if not os.path.exists(folder_path):
-            os.makedirs(folder_path)
-        file_name3 = 'PlaqueAssay_%s_%.2f_%i.txt' % (Parameter,Multiplier,Replicate)
+        file_name3 = 'PlaqueAssay_%i.txt' % (Replicate)
         self.output3 = open(folder_path + file_name3, 'w')
         self.output3.write("%s,%s,%s,%s\n" % ('Time', 'avgI1rd', 'avgI2rd', 'avgDrd'))
         self.output3.flush()
